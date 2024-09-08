@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './App.css'; // Подключение файла стилей
+import myImage from './test.png'; // Импорт изображения из папки src
 
 function App() {
   const [inputValue, setInputValue] = useState('');
@@ -43,6 +44,7 @@ function App() {
         {dateTime.toLocaleString()} {/* Отображение даты и времени */}
       </div>
       <div className="container">
+        <img src={myImage} alt="My Image" className="header-image" /> {/* Добавляем изображение */}
         <h1>HLMK Corporate Page Generator</h1>
         <br></br>
         <br></br>

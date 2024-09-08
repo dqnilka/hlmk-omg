@@ -4,6 +4,14 @@
   box-sizing: border-box;
 }
 
+
+.header-image {
+  max-width: 100%;
+  height: auto;
+  margin-bottom: 20px;
+}
+
+
 html, body {
   height: 100%;
   background-color: #edeef0;
@@ -42,7 +50,7 @@ html, body {
 }
 
 .confirm-button {
-  background-color: #007bff; /* Синий цвет фона */
+  background-color: #015291; /* Синий цвет фона */
   color: white; /* Белый цвет текста */
   font-size: 16px;
   padding: 10px 20px;
