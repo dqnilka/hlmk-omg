@@ -1,0 +1,59 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+  background-color: #edeef0;
+}
+
+.App {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh; /* Высота экрана */
+  position: relative; /* Для позиционирования дочерних элементов */
+}
+
+.date-time {
+  position: absolute;
+  top: 10px;
+  right: 10px; /* Перемещаем дату и время в правый верхний угол */
+  font-size: 14px;
+  color: #333;
+  font-weight: bold; /* Выделение жирным шрифтом */
+}
+
+.container {
+  text-align: center;
+  max-width: 500px;
+  width: 100%;
+}
+
+.text-field {
+  width: 100%;
+  padding: 10px;
+  font-size: 16px;
+  margin-bottom: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.confirm-button {
+  background-color: #007bff; /* Синий цвет фона */
+  color: white; /* Белый цвет текста */
+  font-size: 16px;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px; /* Закругленные углы */
+  cursor: pointer;
+  width: 200px; /* Ширина кнопки */
+  text-align: center;
+  transition: background-color 0.3s ease;
+}
+
+.confirm-button:hover {
+  background-color: #0056b3; /* Цвет при наведении */
+}
