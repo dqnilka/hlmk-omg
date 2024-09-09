@@ -115,7 +115,8 @@ html, body {
 }
 
 .generated-results-container {
-  margin-top: 150px;
+  margin-top: 100px;
+  margin-bottom: 100px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -124,6 +125,7 @@ html, body {
 
 .generated-results {
   margin-top: 20px;
+  margin-bottom: 20px;
   display: flex;
   flex-direction: column;
   gap: 20px;
@@ -136,11 +138,9 @@ html, body {
   align-items: center;
   background-color: #fff;
   padding: 20px;
-  border-radius: 10px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  border-radius: 50px;
+  box-shadow: 0 0 50px rgba(0, 0, 0, 0.1);
   width: 100%;
-  max-width: 600px;
-  margin: 0 auto;
 }
 
 .generated-image {
@@ -152,6 +152,7 @@ html, body {
 .generated-description {
   margin-top: 10px;
   font-size: 18px;
+  font-weight: 200;
   text-align: center;
 }
 

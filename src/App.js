@@ -71,7 +71,7 @@ function App() {
         {!isGenerated && (
           <img src={logoImage}  alt="My Image" className="header-image" />
         )}
-        {isGenerated && (
+        {isGenerated && ( 
           <div className="header-left">
             <a href="http://localhost:3000/">
               <img src={logoImage} alt="Logo" className="header-logo" />
