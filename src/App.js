@@ -69,11 +69,13 @@ function App() {
       {/* Фиксированная верхняя часть */}
       <div className={`header-container ${isGenerated ? 'generated-header' : 'initial-header'}`}>
         {!isGenerated && (
-          <img src={logoImage} alt="My Image" className="header-image" />
+          <img src={logoImage}  alt="My Image" className="header-image" />
         )}
         {isGenerated && (
           <div className="header-left">
-            <img src={logoImage} alt="Logo" className="header-logo" />
+            <a href="http://localhost:3000/">
+              <img src={logoImage} alt="Logo" className="header-logo" />
+            </a>
           </div>
         )}
         <div className="header-center">
