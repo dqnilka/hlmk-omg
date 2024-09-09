@@ -4,101 +4,90 @@
   box-sizing: border-box;
 }
 
-/* Уменьшение отступа после закрепления */
-.App.fixed .generated-results-container {
-  margin-top: 20px; /* Уменьшили отступ между сгенерированными элементами и закрепленным блоком */
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column; /* Центрируем элементы по вертикали */
-}
-
-/* Центрирование самих сгенерированных элементов */
-.generated-results {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 20px;
-}
-
-/* Стили для сгенерированных элементов */
-.generated-item {
-  background-color: #fff;
-  padding: 20px;
-  border-radius: 10px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  width: 100%;
-  max-width: 600px; /* Ограничиваем максимальную ширину сгенерированных элементов */
-}
-
-/* Общие стили для изображения */
-.generated-image {
-  width: 100%; /* Изображение будет занимать всю ширину контейнера */
-  height: auto;
-}
-
-
-
-/* Фиксированная часть страницы */
-.header-container.fixed {
-  margin-bottom: 0;
-}
-
-
 html, body {
   height: 100%;
   background-color: #edeef0;
 }
 
-.App {
+.App.initial {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh; 
-  position: relative; 
-  transition: all 0.5s ease; /* Плавный переход */
+  height: 100vh;
+  flex-direction: column;
 }
 
-.App.fixed {
-  justify-content: flex-start; /* После генерации элементы фиксируются наверху */
-  height: auto;
-}
-
-.header-container {
-  text-align: center;
-  transition: all 0.5s ease; /* Плавный переход */
-}
-
-.header-container.fixed {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  background-color: #fff;
-  z-index: 1000;
-  padding: 10px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+.initial-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
 .header-image {
-  width: 350px; /* Установите фиксированную ширину */
+  width: 350px;
   height: auto;
   margin-bottom: 20px;
 }
 
+/* Состояние после генерации */
+.App.fixed {
+  justify-content: flex-start;
+  height: auto;
+}
+
+.generated-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  height: 10%;
+  padding: 10px 20px;
+  background-color: #fff;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.header-left {
+  flex: 1;
+  display: flex;
+  justify-content: flex-start;
+}
+
+.header-center {
+  flex: 2;
+  display: flex;
+  margin-bottom: 20px;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.header-right {
+  flex: 1;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.header-logo {
+  width: 150px;
+  height: auto;
+  margin-right: 15px;
+}
+
 .date-time {
-  position: absolute;
-  top: 10px;
-  right: 10px; 
   font-size: 14px;
   color: #333;
-  font-weight: bold; 
+  font-weight: bold;
 }
 
 .input-wrapper {
   display: flex;
   justify-content: center;
-  margin-top: 10px;
+  align-items: center;
 }
 
 .text-field {
@@ -126,9 +115,19 @@ html, body {
 }
 
 .generated-results-container {
-  margin-top: 300px; /* Отступ для пространства сверху после фиксации */
-  padding: 20px;
-  height: auto;
+  margin-top: 150px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+.generated-results {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  align-items: center;
 }
 
 .generated-item {
@@ -139,6 +138,9 @@ html, body {
   padding: 20px;
   border-radius: 10px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
 }
 
 .generated-image {
@@ -179,7 +181,7 @@ html, body {
 
 .loading-spinner {
   border: 16px solid #f3f3f3;
-  border-top: 16px solid #3498db;
+  border-top: 16px solid #015291;
   border-radius: 50%;
   width: 120px;
   height: 120px;

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './App.css'; // Подключение файла стилей
-import myImage from './test.png'; // Импорт изображения из папки src
+import logoImage from './test.png'; // Импорт изображения логотипа из папки src
 
 function App() {
   const [inputValue, setInputValue] = useState('');
@@ -8,7 +8,7 @@ function App() {
   const [dateTime, setDateTime] = useState(new Date()); // Состояние для даты и времени
   const [isLoading, setIsLoading] = useState(false); // Состояние для загрузки
   const [generatedData, setGeneratedData] = useState([]); // Массив для хранения сгенерированных данных
-  const [isFixed, setIsFixed] = useState(false); // Состояние для фиксирования элементов наверху
+  const [isGenerated, setIsGenerated] = useState(false); // Состояние для фиксации изменений
 
   // Функция для обновления даты и времени
   const updateDateTime = () => {
@@ -51,7 +51,7 @@ function App() {
       setGeneratedData((prevData) => [
         ...prevData,
         {
-          image: myImage, // Здесь можно подставить динамически сгенерированное изображение
+          image: logoImage, // Здесь можно подставить динамически сгенерированное изображение
           description: `Описание для запроса: ${inputValue}`, // Пример описания, можно заменить
         },
       ]);
@@ -59,34 +59,44 @@ function App() {
       // Очищаем поле ввода
       setInputValue('');
 
-      // Закрепляем элементы в верхней части страницы
-      setIsFixed(true);
+      // Изменяем состояние для отображения нового хедера
+      setIsGenerated(true);
     }, 500); // 0.5 секунд
   };
 
   return (
-    <div className={`App ${isFixed ? 'fixed' : ''}`}>
+    <div className={`App ${isGenerated ? 'fixed' : 'initial'}`}>
       {/* Фиксированная верхняя часть */}
-      <div className={`header-container ${isFixed ? 'fixed' : ''}`}>
-        <div className="date-time">{dateTime.toLocaleString()}</div> {/* Отображение даты и времени */}
-        {!isFixed && ( // Фотография отображается только до генерации
-          <img src={myImage} alt="My Image" className="header-image" />
+      <div className={`header-container ${isGenerated ? 'generated-header' : 'initial-header'}`}>
+        {!isGenerated && (
+          <img src={logoImage} alt="My Image" className="header-image" />
         )}
-        <h1>HLMK Corporate Page Generator</h1>
-        <form onSubmit={handleSubmit} className="input-wrapper">
-          <input
-            type="text"
-            placeholder="Введите запрос для генерации"
-            value={inputValue}
-            onChange={handleInputChange}
-            className={`text-field ${status}`} // Добавляем классы для состояний
-          />
+        {isGenerated && (
+          <div className="header-left">
+            <img src={logoImage} alt="Logo" className="header-logo" />
+          </div>
+        )}
+        <div className="header-center">
+          {!isGenerated && <h1>HLMK Corporate Page Generator</h1>} {/* Убираем текст после генерации */}
           <br></br>
-          <br></br>
-          <button type="submit" className="confirm-button">
-            Подтвердить
-          </button>
-        </form>
+          <form onSubmit={handleSubmit} className="input-wrapper">
+            <input
+              type="text"
+              placeholder="Введите запрос для генерации"
+              value={inputValue}
+              onChange={handleInputChange}
+              className={`text-field ${status}`} // Добавляем классы для состояний
+            />
+            <button type="submit" className="confirm-button">
+              Подтвердить
+            </button>
+          </form>
+        </div>
+        {isGenerated && (
+          <div className="header-right">
+            <div className="date-time">{dateTime.toLocaleString()}</div> {/* Отображение даты и времени */}
+          </div>
+        )}
       </div>
 
       {/* Прокручиваемая область для сгенерированных данных */}
