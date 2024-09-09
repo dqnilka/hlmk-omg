@@ -4,11 +4,44 @@
   box-sizing: border-box;
 }
 
+/* Уменьшение отступа после закрепления */
+.App.fixed .generated-results-container {
+  margin-top: 20px; /* Уменьшили отступ между сгенерированными элементами и закрепленным блоком */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column; /* Центрируем элементы по вертикали */
+}
 
-.header-image {
-  max-width: 100%;
+/* Центрирование самих сгенерированных элементов */
+.generated-results {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+/* Стили для сгенерированных элементов */
+.generated-item {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 600px; /* Ограничиваем максимальную ширину сгенерированных элементов */
+}
+
+/* Общие стили для изображения */
+.generated-image {
+  width: 100%; /* Изображение будет занимать всю ширину контейнера */
   height: auto;
-  margin-bottom: 20px;
+}
+
+
+
+/* Фиксированная часть страницы */
+.header-container.fixed {
+  margin-bottom: 0;
 }
 
 
@@ -23,6 +56,34 @@ html, body {
   align-items: center;
   height: 100vh; 
   position: relative; 
+  transition: all 0.5s ease; /* Плавный переход */
+}
+
+.App.fixed {
+  justify-content: flex-start; /* После генерации элементы фиксируются наверху */
+  height: auto;
+}
+
+.header-container {
+  text-align: center;
+  transition: all 0.5s ease; /* Плавный переход */
+}
+
+.header-container.fixed {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background-color: #fff;
+  z-index: 1000;
+  padding: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.header-image {
+  width: 350px; /* Установите фиксированную ширину */
+  height: auto;
+  margin-bottom: 20px;
 }
 
 .date-time {
@@ -34,34 +95,98 @@ html, body {
   font-weight: bold; 
 }
 
-.container {
-  text-align: center;
-  max-width: 500px;
-  width: 100%;
+.input-wrapper {
+  display: flex;
+  justify-content: center;
+  margin-top: 10px;
 }
 
 .text-field {
-  width: 100%;
   padding: 10px;
   font-size: 16px;
-  margin-bottom: 10px;
+  margin-right: 10px;
+  width: 300px;
+  border-radius: 5px;
   border: 1px solid #ccc;
-  border-radius: 4px;
 }
 
 .confirm-button {
-  background-color: #015291; 
-  color: white;
-  font-size: 16px;
   padding: 10px 20px;
+  font-size: 16px;
+  background-color: #015291;
+  color: white;
   border: none;
-  border-radius: 8px; 
+  border-radius: 8px;
   cursor: pointer;
-  width: 200px; 
-  text-align: center;
   transition: background-color 0.3s ease;
 }
 
 .confirm-button:hover {
-  background-color: #0056b3; 
+  background-color: #013d70;
+}
+
+.generated-results-container {
+  margin-top: 300px; /* Отступ для пространства сверху после фиксации */
+  padding: 20px;
+  height: auto;
+}
+
+.generated-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.generated-image {
+  width: 100%;
+  max-width: 600px;
+  height: auto;
+}
+
+.generated-description {
+  margin-top: 10px;
+  font-size: 18px;
+  text-align: center;
+}
+
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  opacity: 0;
+  animation: fadeIn 0.5s forwards;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.loading-spinner {
+  border: 16px solid #f3f3f3;
+  border-top: 16px solid #3498db;
+  border-radius: 50%;
+  width: 120px;
+  height: 120px;
+  animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
