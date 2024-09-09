@@ -36,6 +36,50 @@ function App() {
     }
   };
 
+  // Функция генерации нескольких связанных элементов
+  const generateRelatedElements = () => {
+    const relatedElements = [
+      <div key="group1">
+        <button>Press</button>
+        <br></br>
+        <br></br>
+      </div>,
+      <div key="group2">
+        <table border="1">
+          <tbody>
+            <tr>
+              <td>Table</td>
+              <td>Hi, I'm your first cell.</td>
+              <td>I'm your second cell.</td>
+              <td>I'm your third cell.</td>
+              <td>I'm your fourth cell.</td>
+            </tr>
+            <tr>
+              <td>Table</td>
+              <td>Hi, I'm your first cell.</td>
+              <td>I'm your second cell.</td>
+              <td>I'm your third cell.</td>
+              <td>I'm your fourth cell.</td>
+            </tr>
+            <tr>
+              <td>Table</td>
+              <td>Hi, I'm your first cell.</td>
+              <td>I'm your second cell.</td>
+              <td>I'm your third cell.</td>
+              <td>I'm your fourth cell.</td>
+            </tr>
+          </tbody>
+        </table>
+        <br></br>
+      </div>,
+      <div key="group3">
+        <input type="text" placeholder="Введите текст" />
+      </div>,
+    ];
+    // Возвращаем все элементы как одну связанную группу
+    return relatedElements;
+  };
+
   const handleSubmit = (event) => {
     event.preventDefault();
     console.log('Отправленный запрос:', inputValue);
@@ -43,15 +87,15 @@ function App() {
     // Запускаем загрузку
     setIsLoading(true);
 
-    // Имитация задержки 0.5 секунд перед показом изображения
+    // Имитация задержки 0.5 секунд перед генерацией элементов
     setTimeout(() => {
       setIsLoading(false);
 
-      // Добавляем новое сгенерированное изображение и описание в массив
+      // Добавляем новую сгенерированную группу элементов в массив
       setGeneratedData((prevData) => [
         ...prevData,
         {
-          image: logoImage, // Здесь можно подставить динамически сгенерированное изображение
+          content: generateRelatedElements(),
           description: `Описание для запроса: ${inputValue}`, // Пример описания, можно заменить
         },
       ]);
@@ -69,9 +113,9 @@ function App() {
       {/* Фиксированная верхняя часть */}
       <div className={`header-container ${isGenerated ? 'generated-header' : 'initial-header'}`}>
         {!isGenerated && (
-          <img src={logoImage}  alt="My Image" className="header-image" />
+          <img src={logoImage} alt="My Image" className="header-image" />
         )}
-        {isGenerated && ( 
+        {isGenerated && (
           <div className="header-left">
             <a href="http://localhost:3000/">
               <img src={logoImage} alt="Logo" className="header-logo" />
@@ -109,11 +153,13 @@ function App() {
           </div>
         )}
 
-        {/* Отображение всех сгенерированных изображений и описаний */}
+        {/* Отображение всех сгенерированных элементов и описаний */}
         <div className="generated-results">
           {generatedData.map((data, index) => (
             <div key={index} className="generated-item">
-              <img src={data.image} alt={`Generated ${index}`} className="generated-image" />
+              {data.content.map((element, i) => (
+                <div key={i}>{element}</div>
+              ))}
               <p className="generated-description">{data.description}</p>
             </div>
           ))}
