@@ -80,6 +80,32 @@ function App() {
     return relatedElements;
   };
 
+  // Обработчик для кнопки "Отправить на согласование"
+  const handleSendForApproval = (index) => {
+    console.log(`Запрос с индексом ${index} отправлен на согласование.`);
+    
+    // Отправляем POST-запрос на сервер с ботом
+    fetch('http://localhost:5000/send-message', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ message: 'Тестовое сообщение!' }),
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        console.log('Сообщение отправлено:', data.message);
+      } else {
+        console.error('Ошибка при отправке сообщения:', data.error);
+      }
+    })
+    .catch((error) => {
+      console.error('Ошибка при отправке сообщения:', error);
+    });
+  };
+  
+
   const handleSubmit = (event) => {
     event.preventDefault();
     console.log('Отправленный запрос:', inputValue);
@@ -160,7 +186,12 @@ function App() {
               {data.content.map((element, i) => (
                 <div key={i}>{element}</div>
               ))}
-              <p className="generated-description">{data.description}</p>
+              {/* Футер карточки */}
+              <div>
+                <p className="generated-description">{data.description}</p>
+                <br></br>
+                <button onClick={() => handleSendForApproval(index)} type="submit" className="confirm-button" >Отправить на согласование</button>
+              </div>
             </div>
           ))}
         </div>

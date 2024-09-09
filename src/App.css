@@ -150,9 +150,9 @@ html, body {
 }
 
 .generated-description {
-  margin-top: 10px;
-  font-size: 18px;
-  font-weight: 200;
+  margin-top: 70px;
+  font-size: 15px;
+  font-weight: 3000;
   text-align: center;
 }
 
@@ -192,4 +192,21 @@ html, body {
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
+}
+
+.card-footer {
+  padding: 15px;
+  background-color: #f0f0f0;
+  border-top: 1px solid #ddd;
+  margin-top: 15px;
+  text-align: center;
+}
+
+.generated-item {
+  margin-bottom: 20px;
+  padding: 15px;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  background-color: #fff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }

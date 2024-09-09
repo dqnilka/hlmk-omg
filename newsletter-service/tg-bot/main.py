@@ -1,28 +1,23 @@
-import telebot
-from telebot import types
+from flask import Flask, request, jsonify
+from telegram import Bot
+import os
 
-API_KEY = 'YOUR_API_KEY'
-bot = telebot.TeleBot(API_KEY)
+app = Flask(__name__)
 
-@bot.message_handler(commands=['start'])
-def send_welcome(message):
-    markup = types.ReplyKeyboardMarkup(row_width=2)
-    history_button = types.KeyboardButton('История')
-    help_button = types.KeyboardButton('Помощь')
-    markup.add(history_button, help_button)
+TELEGRAM_TOKEN = ''
+CHAT_ID = '465391024' 
+bot = Bot(token=TELEGRAM_TOKEN)
 
-    bot.send_message(
-        message.chat.id,
-        "Привет! Это Бот HLMK Corporate Page Generator.",
-        reply_markup=markup
-    )
+@app.route('/send-message', methods=['POST'])
+def send_message():
+    data = request.json
+    message = data.get('message', 'Тестовое сообщение!')
+    
+    try:
+        bot.send_message(chat_id=CHAT_ID, text=message)
+        return jsonify({'success': True, 'message': 'Сообщение отправлено!'}), 200
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
 
-@bot.message_handler(regexp="История")
-def show_history(message):
-    bot.send_message(message.chat.id, "Здесь будет ваша история.")
-
-@bot.message_handler(regexp="Помощь")
-def show_help(message):
-    bot.send_message(message.chat.id, "Это раздел помощи. Чем могу помочь?")
-
-bot.polling()
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5000)
