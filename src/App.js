@@ -1,21 +1,19 @@
 import React, { useState, useEffect } from 'react';
-import './App.css'; // Подключение файла стилей
-import logoImage from './test.png'; // Импорт изображения логотипа из папки src
+import './App.css'; 
+import logoImage from './test.png'; 
 
 function App() {
   const [inputValue, setInputValue] = useState('');
-  const [status, setStatus] = useState(''); // Статус для отображения (error, warning, success)
-  const [dateTime, setDateTime] = useState(new Date()); // Состояние для даты и времени
-  const [isLoading, setIsLoading] = useState(false); // Состояние для загрузки
-  const [generatedData, setGeneratedData] = useState([]); // Массив для хранения сгенерированных данных
-  const [isGenerated, setIsGenerated] = useState(false); // Состояние для фиксации изменений
+  const [status, setStatus] = useState(''); 
+  const [dateTime, setDateTime] = useState(new Date()); 
+  const [isLoading, setIsLoading] = useState(false);
+  const [generatedData, setGeneratedData] = useState([]); 
+  const [isGenerated, setIsGenerated] = useState(false); 
 
-  // Функция для обновления даты и времени
   const updateDateTime = () => {
     setDateTime(new Date());
   };
 
-  // Обновление даты и времени каждую секунду
   useEffect(() => {
     const interval = setInterval(updateDateTime, 1000);
     return () => clearInterval(interval);
@@ -24,7 +22,6 @@ function App() {
   const handleInputChange = (event) => {
     setInputValue(event.target.value);
 
-    // Пример логики для изменения статуса
     if (event.target.value.length > 10) {
       setStatus('success');
     } else if (event.target.value.length > 5) {
@@ -36,7 +33,6 @@ function App() {
     }
   };
 
-  // Функция генерации нескольких связанных элементов
   const generateRelatedElements = () => {
     const relatedElements = [
       <div key="group1">
@@ -76,15 +72,12 @@ function App() {
         <input type="text" placeholder="Введите текст" />
       </div>,
     ];
-    // Возвращаем все элементы как одну связанную группу
     return relatedElements;
   };
 
-  // Обработчик для кнопки "Отправить на согласование"
   const handleSendForApproval = (index) => {
     console.log(`Запрос с индексом ${index} отправлен на согласование.`);
     
-    // Отправляем POST-запрос на сервер с ботом
     fetch('http://localhost:5000/send-message', {
       method: 'POST',
       headers: {
@@ -110,33 +103,27 @@ function App() {
     event.preventDefault();
     console.log('Отправленный запрос:', inputValue);
 
-    // Запускаем загрузку
     setIsLoading(true);
 
-    // Имитация задержки 0.5 секунд перед генерацией элементов
     setTimeout(() => {
       setIsLoading(false);
 
-      // Добавляем новую сгенерированную группу элементов в массив
       setGeneratedData((prevData) => [
         ...prevData,
         {
           content: generateRelatedElements(),
-          description: `Описание для запроса: ${inputValue}`, // Пример описания, можно заменить
+          description: `Описание для запроса: ${inputValue}`, 
         },
       ]);
 
-      // Очищаем поле ввода
       setInputValue('');
 
-      // Изменяем состояние для отображения нового хедера
       setIsGenerated(true);
-    }, 500); // 0.5 секунд
+    }, 500); 
   };
 
   return (
     <div className={`App ${isGenerated ? 'fixed' : 'initial'}`}>
-      {/* Фиксированная верхняя часть */}
       <div className={`header-container ${isGenerated ? 'generated-header' : 'initial-header'}`}>
         {!isGenerated && (
           <img src={logoImage} alt="My Image" className="header-image" />
@@ -149,7 +136,7 @@ function App() {
           </div>
         )}
         <div className="header-center">
-          {!isGenerated && <h1>HLMK Corporate Page Generator</h1>} {/* Убираем текст после генерации */}
+          {!isGenerated && <h1>HLMK Corporate Page Generator</h1>} 
           <br></br>
           <form onSubmit={handleSubmit} className="input-wrapper">
             <input
@@ -157,7 +144,7 @@ function App() {
               placeholder="Введите запрос для генерации"
               value={inputValue}
               onChange={handleInputChange}
-              className={`text-field ${status}`} // Добавляем классы для состояний
+              className={`text-field ${status}`} 
             />
             <button type="submit" className="confirm-button">
               Подтвердить
@@ -166,12 +153,11 @@ function App() {
         </div>
         {isGenerated && (
           <div className="header-right">
-            <div className="date-time">{dateTime.toLocaleString()}</div> {/* Отображение даты и времени */}
+            <div className="date-time">{dateTime.toLocaleString()}</div> 
           </div>
         )}
       </div>
 
-      {/* Прокручиваемая область для сгенерированных данных */}
       <div className="generated-results-container">
         {isLoading && (
           <div className="loading-overlay">
@@ -179,14 +165,12 @@ function App() {
           </div>
         )}
 
-        {/* Отображение всех сгенерированных элементов и описаний */}
         <div className="generated-results">
           {generatedData.map((data, index) => (
             <div key={index} className="generated-item">
               {data.content.map((element, i) => (
                 <div key={i}>{element}</div>
               ))}
-              {/* Футер карточки */}
               <div>
                 <p className="generated-description">{data.description}</p>
                 <br></br>
