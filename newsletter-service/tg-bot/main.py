@@ -1,7 +1,7 @@
 import telebot
 from flask import Flask, request, jsonify
 
-TELEGRAM_TOKEN = '7304368665:AAHaDslyPe06nmsvihiK9AKbrRWIv6FAEDA'
+TELEGRAM_TOKEN = ''
 USER_ID = '465391024'
 
 bot = telebot.TeleBot(TELEGRAM_TOKEN)
