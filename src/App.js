@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './App.css'; // Подключение файла стилей
+import axios from 'axios'
 import logoImage from './test.png'; // Импорт изображения логотипа из папки src
 
 function App() {
@@ -109,6 +110,10 @@ function App() {
   const handleSubmit = (event) => {
     event.preventDefault();
     console.log('Отправленный запрос:', inputValue);
+    axios.get('http://127.0.0.1:5000/api/main')
+    .then(r => {
+    console.log('r', r.data)}
+    );
 
     // Запускаем загрузку
     setIsLoading(true);
