@@ -109,11 +109,18 @@ function App() {
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    console.log('Отправленный запрос:', inputValue);
+    console.log('Запрос', inputValue);
+
+    axios.post('http://127.0.0.1:5000/api/main', {
+      'Отправленный запрос': inputValue}).then(inputValue => {
+        console.log('Отправленный запрос', inputValue)
+        });
+
+
     axios.get('http://127.0.0.1:5000/api/main')
-    .then(r => {
-    console.log('r', r.data)}
-    );
+      .then(r => {
+        console.log('Информация с модели', r.data)}
+      );
 
     // Запускаем загрузку
     setIsLoading(true);

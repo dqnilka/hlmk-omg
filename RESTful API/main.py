@@ -1,14 +1,9 @@
-from flask import Flask, jsonify
-from flask_restful import Api, Resource
+from flask import Flask, jsonify, request
+from flask_restful import Api, Resource,reqparse
 from flask_cors import CORS, cross_origin
 
 app = Flask(__name__)
-# CORS(app)
-# cors = CORS(app, resource={
-#     r"/*": {
-#         "origins": ["http://localhost:3000", "http://127.0.0.1:3000"],
-#     }
-# })
+CORS(app, resources=r'/api/*')
 
 api = Api()
 
@@ -24,10 +19,9 @@ class Main(Resource):
 
     @app.route("/", methods=["POST"])
     @cross_origin()
-    def post_example(self):
-        """POST in server"""
-        return jsonify(message="POST request returned")
-
+    def post(self):
+        if request.method == 'POST':
+            print('ТЕСТ')
 
 api.add_resource(Main, "/api/main")
 api.init_app(app)
