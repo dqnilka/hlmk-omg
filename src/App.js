@@ -1,14 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import './App.css'; 
-import logoImage from './test.png'; 
+import './App.css';
+import logoImage from './test.png';
 
 function App() {
   const [inputValue, setInputValue] = useState('');
-  const [status, setStatus] = useState(''); 
-  const [dateTime, setDateTime] = useState(new Date()); 
+  const [status, setStatus] = useState('');
+
+  const [dateTime, setDateTime] = useState(new Date());
   const [isLoading, setIsLoading] = useState(false);
-  const [generatedData, setGeneratedData] = useState([]); 
-  const [isGenerated, setIsGenerated] = useState(false); 
+  const [generatedData, setGeneratedData] = useState([]);
+  const [isGenerated, setIsGenerated] = useState(false);
+  const [showPopup, setShowPopup] = useState(false); // Состояние для управления Pop-up окном
+  const [comment, setComment] = useState(''); // Для хранения комментария
 
   const updateDateTime = () => {
     setDateTime(new Date());
@@ -35,69 +38,72 @@ function App() {
 
   const generateRelatedElements = () => {
     const relatedElements = [
-      <div key="group1">
-        <button>Press</button>
-        <br></br>
-        <br></br>
-      </div>,
-      <div key="group2">
-        <table border="1">
-          <tbody>
-            <tr>
-              <td>Table</td>
-              <td>Hi, I'm your first cell.</td>
-              <td>I'm your second cell.</td>
-              <td>I'm your third cell.</td>
-              <td>I'm your fourth cell.</td>
-            </tr>
-            <tr>
-              <td>Table</td>
-              <td>Hi, I'm your first cell.</td>
-              <td>I'm your second cell.</td>
-              <td>I'm your third cell.</td>
-              <td>I'm your fourth cell.</td>
-            </tr>
-            <tr>
-              <td>Table</td>
-              <td>Hi, I'm your first cell.</td>
-              <td>I'm your second cell.</td>
-              <td>I'm your third cell.</td>
-              <td>I'm your fourth cell.</td>
-            </tr>
-          </tbody>
-        </table>
-        <br></br>
-      </div>,
-      <div key="group3">
-        <input type="text" placeholder="Введите текст" />
-      </div>,
+      <body>
+        <header>
+          <h1>Личный сайт</h1>
+          <p>Который сделан на основе готового шаблона</p>
+          <nav>
+            <ul>
+              <li><a href="index.html">Эта страница</a></li>
+              <li><a href="catalog.html">Другая страница</a></li>
+            </ul>
+          </nav>
+        </header>
+        <main>
+          <article>
+            <section>
+              <h2>Первая секция</h2>
+              <p>Она обо мне</p>
+              <p>Но может быть и о семантике, я пока не решил.</p>
+            </section>
+            <section>
+              <h2>Вторая секция</h2>
+              <p>Она тоже обо мне</p>
+            </section>
+            <section>
+              <h2>И третья</h2>
+              <p>Вы уже должны были начать догадываться.</p>
+            </section>
+          </article>
+        </main>
+        <footer>
+          <p>Сюда бы я вписал информацию об авторе и ссылки на другие сайты</p>
+        </footer>
+        сюда можно подключить jquery <script src="scripts/app.js" defer></script>
+      </body>
+      ,
     ];
     return relatedElements;
   };
 
   const handleSendForApproval = (index) => {
-    console.log(`Запрос с индексом ${index} отправлен на согласование.`);
-    
+    // Показываем Pop-up окно при нажатии
+    setShowPopup(true);
+  };
+
+  const handleSubmitComment = () => {
+    // Отправляем комментарий на сервер Telegram-бота
     fetch('http://localhost:5000/send-message', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ message: 'Тестовое сообщение!' }),
+      body: JSON.stringify({ message: comment }),
     })
-    .then(response => response.json())
-    .then(data => {
-      if (data.success) {
-        console.log('Сообщение отправлено:', data.message);
-      } else {
-        console.error('Ошибка при отправке сообщения:', data.error);
-      }
-    })
-    .catch((error) => {
-      console.error('Ошибка при отправке сообщения:', error);
-    });
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          console.log('Комментарий отправлен:', data.message);
+        } else {
+          console.error('Ошибка при отправке комментария:', data.error);
+        }
+        setShowPopup(false); // Закрываем Pop-up после успешной отправки
+        setComment(''); // Очищаем поле комментария
+      })
+      .catch((error) => {
+        console.error('Ошибка при отправке комментария:', error);
+      });
   };
-  
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -112,14 +118,13 @@ function App() {
         ...prevData,
         {
           content: generateRelatedElements(),
-          description: `Описание для запроса: ${inputValue}`, 
+          description: `Описание для запроса: ${inputValue}`,
         },
       ]);
 
       setInputValue('');
-
       setIsGenerated(true);
-    }, 500); 
+    }, 1500);
   };
 
   return (
@@ -136,7 +141,7 @@ function App() {
           </div>
         )}
         <div className="header-center">
-          {!isGenerated && <h1>HLMK Corporate Page Generator</h1>} 
+          {!isGenerated && <h1>HLMK Corporate Page Generator</h1>}
           <br></br>
           <form onSubmit={handleSubmit} className="input-wrapper">
             <input
@@ -144,7 +149,7 @@ function App() {
               placeholder="Введите запрос для генерации"
               value={inputValue}
               onChange={handleInputChange}
-              className={`text-field ${status}`} 
+              className={`text-field ${status}`}
             />
             <button type="submit" className="confirm-button">
               Подтвердить
@@ -153,7 +158,7 @@ function App() {
         </div>
         {isGenerated && (
           <div className="header-right">
-            <div className="date-time">{dateTime.toLocaleString()}</div> 
+            <div className="date-time">{dateTime.toLocaleString()}</div>
           </div>
         )}
       </div>
@@ -168,18 +173,43 @@ function App() {
         <div className="generated-results">
           {generatedData.map((data, index) => (
             <div key={index} className="generated-item">
-              {data.content.map((element, i) => (
-                <div key={i}>{element}</div>
-              ))}
-              <div>
+              <div className="generated-content-block">
+                {data.content.map((element, i) => (
+                  <div key={i}>{element}</div>
+                ))}
+              </div>
+              <div className="generated-description-block">
                 <p className="generated-description">{data.description}</p>
                 <br></br>
-                <button onClick={() => handleSendForApproval(index)} type="submit" className="confirm-button" >Отправить на согласование</button>
+                <button onClick={() => handleSendForApproval(index)} type="submit" className="confirm-button">
+                  Отправить на согласование
+                </button>
               </div>
             </div>
           ))}
         </div>
       </div>
+
+      {/* Pop-up для ввода комментария */}
+      {showPopup && (
+        <div className="popup-overlay">
+          <div className="popup-content">
+            <h2>Введите комментарий</h2>
+            <br></br>
+            <input
+              type="text"
+              value={comment}
+              onChange={(e) => setComment(e.target.value)}
+              className="comment-input-popup"
+              placeholder="Введите комментарий"
+            />
+            <br></br>
+            <button onClick={handleSubmitComment} className="confirm-button">
+              Подтвердить
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
