@@ -111,11 +111,21 @@ function App() {
     event.preventDefault();
     console.log('Запрос', inputValue);
 
-    axios.post('http://127.0.0.1:5000/api/main', {
-      'Отправленный запрос': inputValue}).then(inputValue => {
-        console.log('Отправленный запрос', inputValue)
-        });
+    axios({
+          method: 'post',
+          url: 'http://127.0.0.1:5000/api/main',
 
+          data: {
+            text_message: inputValue
+          },
+        })
+        .then(function(response) {
+          console.log('Ответ сервера успешно получен!');
+          console.log(response.data);
+        })
+        .catch(function(error) {
+          console.log(error);
+        });
 
     axios.get('http://127.0.0.1:5000/api/main')
       .then(r => {

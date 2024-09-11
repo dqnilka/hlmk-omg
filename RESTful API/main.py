@@ -18,10 +18,12 @@ class Main(Resource):
         return response
 
     @app.route("/", methods=["POST"])
-    @cross_origin()
     def post(self):
         if request.method == 'POST':
-            print('ТЕСТ')
+            t = request.data
+            print(t)
+            # data = request.json
+            # print(data)
 
 api.add_resource(Main, "/api/main")
 api.init_app(app)
