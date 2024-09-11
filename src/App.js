@@ -115,22 +115,18 @@ function App() {
           method: 'post',
           url: 'http://127.0.0.1:5000/api/main',
 
-          data: {
-            text_message: inputValue
-          },
+          data: {text: inputValue}
+          ,
         })
-        .then(function(response) {
+        .then(
+        function(response) {
           console.log('Ответ сервера успешно получен!');
-          console.log(response.data);
-        })
+          axios.get('http://127.0.0.1:5000/api/main').then(r => {console.log('Информация с модели', r.data)});}
+        )
         .catch(function(error) {
           console.log(error);
         });
 
-    axios.get('http://127.0.0.1:5000/api/main')
-      .then(r => {
-        console.log('Информация с модели', r.data)}
-      );
 
     // Запускаем загрузку
     setIsLoading(true);
