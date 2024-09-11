@@ -1,5 +1,5 @@
 from flask import Flask, jsonify, request
-from flask_restful import Api, Resource,reqparse
+from flask_restful import Api, Resource, reqparse
 from flask_cors import CORS, cross_origin
 import time
 
@@ -20,7 +20,6 @@ class Main(Resource):
 
         # принимаем CORS
         response.headers.add("Access-Control-Allow-Origin", "*")
-        print(2)
         return response
 
     @app.route("/", methods=["POST"])
@@ -32,7 +31,7 @@ class Main(Resource):
 
     def process_frontend(self):
         self.text_llm = self.answer_front_str.split(':')[1][1:][:-2]
-        print(1)
+        print(self.text_llm)
 
 
 api.add_resource(Main, "/api/main")
