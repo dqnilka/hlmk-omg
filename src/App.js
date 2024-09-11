@@ -1,17 +1,21 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import './App.css';
 import logoImage from './test.png';
+import html2canvas from 'html2canvas';
 
 function App() {
   const [inputValue, setInputValue] = useState('');
   const [status, setStatus] = useState('');
-
   const [dateTime, setDateTime] = useState(new Date());
   const [isLoading, setIsLoading] = useState(false);
   const [generatedData, setGeneratedData] = useState([]);
   const [isGenerated, setIsGenerated] = useState(false);
-  const [showPopup, setShowPopup] = useState(false); // Состояние для управления Pop-up окном
-  const [comment, setComment] = useState(''); // Для хранения комментария
+  const [showPopup, setShowPopup] = useState(false);
+  const [comment, setComment] = useState('');
+  const [isSending, setIsSending] = useState(false);
+  const [initialRequest, setInitialRequest] = useState(''); 
+
+  const relatedElementsRef = useRef(); 
 
   const updateDateTime = () => {
     setDateTime(new Date());
@@ -38,7 +42,7 @@ function App() {
 
   const generateRelatedElements = () => {
     const relatedElements = [
-      <body>
+      <div ref={relatedElementsRef}>
         <header>
           <h1>Личный сайт</h1>
           <p>Который сделан на основе готового шаблона</p>
@@ -50,79 +54,82 @@ function App() {
           </nav>
         </header>
         <main>
-          <article>
-            <section>
-              <h2>Первая секция</h2>
-              <p>Она обо мне</p>
-              <p>Но может быть и о семантике, я пока не решил.</p>
-            </section>
-            <section>
-              <h2>Вторая секция</h2>
-              <p>Она тоже обо мне</p>
-            </section>
-            <section>
-              <h2>И третья</h2>
-              <p>Вы уже должны были начать догадываться.</p>
-            </section>
-          </article>
+          <section>
+            <h2>Первая секция</h2>
+            <p>Она обо мне</p>
+            <p>Но может быть и о семантике, я пока не решил.</p>
+          </section>
+          <section>
+            <h2>Вторая секция</h2>
+            <p>Она тоже обо мне</p>
+          </section>
+          <section>
+            <h2>И третья</h2>
+            <p>Вы уже должны были начать догадываться.</p>
+          </section>
         </main>
         <footer>
           <p>Сюда бы я вписал информацию об авторе и ссылки на другие сайты</p>
         </footer>
-        сюда можно подключить jquery <script src="scripts/app.js" defer></script>
-      </body>
-      ,
+      </div>
     ];
     return relatedElements;
   };
 
   const handleSendForApproval = (index) => {
-    // Показываем Pop-up окно при нажатии
     setShowPopup(true);
   };
 
-  const handleSubmitComment = () => {
-    // Отправляем комментарий на сервер Telegram-бота
+  const handleSubmitComment = async () => {
+    setIsSending(true);
+
+    const canvas = await html2canvas(relatedElementsRef.current);
+    const imageData = canvas.toDataURL('image/png');
+    console.log("Отправляем данные на сервер:", { message: comment, initialRequest: initialRequest });
+
     fetch('http://localhost:5000/send-message', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ message: comment }),
+      body: JSON.stringify({
+        message: comment,
+        image: imageData,
+        initialRequest: initialRequest,  
+      }),
     })
       .then(response => response.json())
       .then(data => {
         if (data.success) {
-          console.log('Комментарий отправлен:', data.message);
+          console.log('Комментарий, скриншот и первоначальный запрос отправлены:', data.message);
         } else {
-          console.error('Ошибка при отправке комментария:', data.error);
+          console.error('Ошибка при отправке:', data.error);
         }
-        setShowPopup(false); // Закрываем Pop-up после успешной отправки
-        setComment(''); // Очищаем поле комментария
+        setIsSending(false);
+        setShowPopup(false);
+        setComment('');
       })
       .catch((error) => {
-        console.error('Ошибка при отправке комментария:', error);
+        console.error('Ошибка при отправке:', error);
+        setIsSending(false);
       });
   };
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    console.log('Отправленный запрос:', inputValue);
-
     setIsLoading(true);
 
     setTimeout(() => {
       setIsLoading(false);
-
       setGeneratedData((prevData) => [
         ...prevData,
         {
           content: generateRelatedElements(),
-          description: `Описание для запроса: ${inputValue}`,
+          description: `${inputValue}`,
         },
       ]);
-
-      setInputValue('');
+      setInitialRequest(inputValue);  
+      setInputValue('');  
       setIsGenerated(true);
     }, 1500);
   };
@@ -171,7 +178,7 @@ function App() {
         )}
 
         <div className="generated-results">
-          {generatedData.map((data, index) => (
+          {generatedData.slice().reverse().map((data, index) => (
             <div key={index} className="generated-item">
               <div className="generated-content-block">
                 {data.content.map((element, i) => (
@@ -179,9 +186,11 @@ function App() {
                 ))}
               </div>
               <div className="generated-description-block">
-                <p className="generated-description">{data.description}</p>
+                <p className="generated-description">
+                  <span className="bold-text">Описание для запроса:</span> <span className="italic-text">{data.description}</span>
+                </p>
                 <br></br>
-                <button onClick={() => handleSendForApproval(index)} type="submit" className="confirm-button">
+                <button onClick={() => handleSendForApproval(index)} className="confirm-button">
                   Отправить на согласование
                 </button>
               </div>
@@ -190,7 +199,6 @@ function App() {
         </div>
       </div>
 
-      {/* Pop-up для ввода комментария */}
       {showPopup && (
         <div className="popup-overlay">
           <div className="popup-content">
@@ -207,6 +215,15 @@ function App() {
             <button onClick={handleSubmitComment} className="confirm-button">
               Подтвердить
             </button>
+          </div>
+        </div>
+      )}
+
+      {isSending && (
+        <div className="popup-overlay">
+          <div className="popup-content">
+            <div className="loading-spinner"></div>
+            <p>Отправка комментария...</p>
           </div>
         </div>
       )}
