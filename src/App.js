@@ -7,6 +7,7 @@ import { io } from "socket.io-client";
 
 function App() {
   const [inputValue, setInputValue] = useState('');
+  const [components, setComponents] = useState([]);  
   const [status, setStatus] = useState('');
   const [dateTime, setDateTime] = useState(new Date());
   const [isLoading, setIsLoading] = useState(false);
@@ -20,27 +21,61 @@ function App() {
 
   const relatedElementsRef = useRef();
 
+  const fetchComponentsFromServer = async () => {
+    try {
+      const response = await fetch('http://localhost:5001/api/main', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ inputValue }), 
+      });
+  
+      const data = await response.json();
+      const { components } = data;
+  
+      const generatedComponents = components.map((component, index) => {
+        let reactComponent;
+  
+        switch (component.type) {
+          case 'Avatar':
+            reactComponent = <Avatar key={index} {...component.props} />;
+            break;
+          case 'File':
+            reactComponent = <File key={index} {...component.props} />;
+            break;
+          case 'Select':
+            reactComponent = <Select key={index} {...component.props} selected={[]} onSelectionChange={() => { }} />;
+            break;
+          case 'Button':
+            reactComponent = <Button key={index} {...component.props}>{component.props.children}</Button>;
+            break;
+          default:
+            reactComponent = null;
+        }
+  
+        return (
+          <React.Fragment key={index}>
+            {reactComponent}
+            <br /> 
+          </React.Fragment>
+        );
+      });
+  
+      setComponents(generatedComponents); 
+    } catch (error) {
+      console.error('Ошибка при получении данных с сервера:', error);
+    }
+  };
+  
+  
+
   const relatedElements = useMemo(() => (
     <div ref={relatedElementsRef}>
-      <Avatar userName="Иван" userSurname="Иванов" />
-      <br />
-      <File label="Прикрепите файл" />
-      <br />
-      <Select
-        options={[
-          { value: 'male', label: 'Мужской' },
-          { value: 'female', label: 'Женский' }
-        ]}
-        label="Пол"
-        selected={[]}
-        onSelectionChange={() => { }}
-      />
-      <br />
-      <Button style={{ backgroundColor: 'blue', color: 'white' }}>
-        Сдать ответ
-      </Button>
+      {components.length > 0 ? components : 'some text info'}
     </div>
-  ), []);
+  ), [components]);  
+  
 
   const updateDateTime = () => {
     setDateTime(new Date());
@@ -117,6 +152,8 @@ function App() {
   const handleSubmit = (event) => {
     event.preventDefault();
     setIsLoading(true);
+
+    fetchComponentsFromServer();
 
     setTimeout(() => {
       const messageId = Date.now();
