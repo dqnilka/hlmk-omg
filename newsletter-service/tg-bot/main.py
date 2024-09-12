@@ -76,9 +76,6 @@ def handle_rating_callback(call):
     user_id = call.from_user.id
     rating = call.data
     message_id = call.message.message_id 
-
-    print(f"WebSocket: Отправляем данные: message_id={message_id}, rating={rating}")
-
     result_message = "Данные переданны оператору." if rating == "like" else "Данные переданны оператору."
     bot.send_message(user_id, result_message)
 
