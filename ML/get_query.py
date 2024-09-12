@@ -6,21 +6,18 @@ from utils.components_base import COMPONENTS_BASE
 # Укажи свой ключ API здесь
 openai.api_key = 'твой-ключ-API'
 
-def get_gpt_response(prompt):
+def get_gpt_response(task):
     try:
         # Отправляем запрос к модели
-        response = openai.ChatCompletion.create(
-            model="gpt-4o",  # Используем модель gpt-4o
-            messages=[
-                {"role": "system", "content": "You are a helpful assistant."},
-                {"role": "user", "content": prompt}
-            ],
+        response = openai.completions.create(
+            model="gpt-4",  # Используем модель GPT-4 или другую
+            prompt=task,
             max_tokens=5000,  # Максимальное количество токенов в ответе
-            temperature=0.7,   # "Креативность" модели
+            temperature=0.7   # Степень креативности ответов
         )
         
         # Получаем текст ответа
-        return response['choices'][0]['message']['content']
+        return response.choices[0].text.strip()
     
     except Exception as e:
         return f"Произошла ошибка: {e}"
