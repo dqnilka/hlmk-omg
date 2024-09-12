@@ -4,7 +4,7 @@ from utils.prompt_template import PROMPT_TEMPLATE
 from utils.components_base import COMPONENTS_BASE
 
 # Укажи свой ключ API здесь
-openai.api_key = 'твой-ключ-API'
+openai.api_key = os.environ.get('OPEN_AI_TOKEN')
 
 def get_gpt_response(task):
     try:
