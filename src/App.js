@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo, useRef } from 'react';
 import './App.css';
 import logoImage from './logo.svg';
 import html2canvas from 'html2canvas';
-import { Avatar, Button, File, Select } from '@nlmk/ds-2.0';
+import { Avatar, Button, File, Select, Spinner } from '@nlmk/ds-2.0';
 import { io } from "socket.io-client";
 
 function App() {
@@ -16,7 +16,7 @@ function App() {
   const [comment, setComment] = useState('');
   const [isSending, setIsSending] = useState(false);
   const [initialRequest, setInitialRequest] = useState('');
-  const [sendingData, setSendingData] = useState(null); 
+  const [sendingData, setSendingData] = useState(null);
 
   const relatedElementsRef = useRef();
 
@@ -68,16 +68,16 @@ function App() {
   const handleSendForApproval = (messageId) => {
     const dataToSend = generatedData.find(data => data.messageId === messageId);
     setSendingData(dataToSend);
-    setShowPopup(true); 
+    setShowPopup(true);
   };
 
   const handleSubmitComment = async () => {
     setIsSending(true);
-  
+
     const canvas = await html2canvas(relatedElementsRef.current);
     const imageData = canvas.toDataURL('image/png');
     console.log("Отправляем данные на сервер:", { message: comment, initialRequest: sendingData?.description });
-  
+
     fetch('http://localhost:5000/send-message', {
       method: 'POST',
       headers: {
@@ -93,11 +93,11 @@ function App() {
       .then(data => {
         if (data.success) {
           console.log('Комментарий, скриншот и первоначальный запрос отправлены:', data.message);
-          const messageId = data.message_id;  
-  
+          const messageId = data.message_id;
+
           setGeneratedData(prevData => prevData.map(d =>
-            d.messageId === sendingData.messageId 
-              ? { ...d, messageId: messageId, rating: { like: 0, dislike: 0 } } 
+            d.messageId === sendingData.messageId
+              ? { ...d, messageId: messageId, rating: { like: 0, dislike: 0 } }
               : d
           ));
         } else {
@@ -112,7 +112,7 @@ function App() {
         setIsSending(false);
       });
   };
-  
+
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -213,7 +213,7 @@ function App() {
       <div className="generated-results-container">
         {isLoading && (
           <div className="loading-overlay">
-            <div className="loading-spinner"></div>
+            <Spinner size="l" />
           </div>
         )}
 
@@ -262,11 +262,8 @@ function App() {
       )}
 
       {isSending && (
-        <div className="popup-overlay">
-          <div className="popup-content">
-            <div className="loading-spinner"></div>
-            <p>Отправка комментария...</p>
-          </div>
+        <div className="loading-overlay">
+          <Spinner size="l" />
         </div>
       )}
     </div>
