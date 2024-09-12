@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import './App.css';
 import logoImage from './logo.svg';
 import html2canvas from 'html2canvas';
@@ -16,9 +16,31 @@ function App() {
   const [comment, setComment] = useState('');
   const [isSending, setIsSending] = useState(false);
   const [initialRequest, setInitialRequest] = useState('');
-  const [relatedElements, setRelatedElements] = useState(null);
+  const [sendingData, setSendingData] = useState(null); 
 
   const relatedElementsRef = useRef();
+
+  const relatedElements = useMemo(() => (
+    <div ref={relatedElementsRef}>
+      <Avatar userName="Иван" userSurname="Иванов" />
+      <br />
+      <File label="Прикрепите файл" />
+      <br />
+      <Select
+        options={[
+          { value: 'male', label: 'Мужской' },
+          { value: 'female', label: 'Женский' }
+        ]}
+        label="Пол"
+        selected={[]}
+        onSelectionChange={() => { }}
+      />
+      <br />
+      <Button style={{ backgroundColor: 'blue', color: 'white' }}>
+        Сдать ответ
+      </Button>
+    </div>
+  ), []);
 
   const updateDateTime = () => {
     setDateTime(new Date());
@@ -28,34 +50,6 @@ function App() {
     const interval = setInterval(updateDateTime, 1000);
     return () => clearInterval(interval);
   }, []);
-
-  const generateRelatedElements = useCallback(() => {
-    return (
-      <div ref={relatedElementsRef}>
-        <Avatar userName="Иван" userSurname="Иванов" />
-        <br />
-        <File label="Прикрепите файл" />
-        <br />
-        <Select
-          options={[
-            { value: 'male', label: 'Мужской' },
-            { value: 'female', label: 'Женский' }
-          ]}
-          label="Пол"
-          selected={[]}
-          onSelectionChange={() => {}}
-        />
-        <br />
-        <Button style={{ backgroundColor: 'blue', color: 'white' }}>
-          Сдать ответ
-        </Button>
-      </div>
-    );
-  }, []);
-
-  useEffect(() => {
-    setRelatedElements(generateRelatedElements());
-  }, [generateRelatedElements]);
 
   const handleInputChange = (event) => {
     setInputValue(event.target.value);
@@ -71,17 +65,19 @@ function App() {
     }
   };
 
-  const handleSendForApproval = () => {
-    setShowPopup(true);
+  const handleSendForApproval = (messageId) => {
+    const dataToSend = generatedData.find(data => data.messageId === messageId);
+    setSendingData(dataToSend);
+    setShowPopup(true); 
   };
 
   const handleSubmitComment = async () => {
     setIsSending(true);
-
+  
     const canvas = await html2canvas(relatedElementsRef.current);
     const imageData = canvas.toDataURL('image/png');
-    console.log("Отправляем данные на сервер:", { message: comment, initialRequest: initialRequest });
-
+    console.log("Отправляем данные на сервер:", { message: comment, initialRequest: sendingData?.description });
+  
     fetch('http://localhost:5000/send-message', {
       method: 'POST',
       headers: {
@@ -90,24 +86,20 @@ function App() {
       body: JSON.stringify({
         message: comment,
         image: imageData,
-        initialRequest: initialRequest,
+        initialRequest: sendingData?.description,
       }),
     })
       .then(response => response.json())
       .then(data => {
         if (data.success) {
           console.log('Комментарий, скриншот и первоначальный запрос отправлены:', data.message);
-          const messageId = data.message_id;
-
-          setGeneratedData(prevData => [
-            ...prevData,
-            {
-              content: relatedElements,
-              description: `${initialRequest}`,
-              messageId: messageId,
-              rating: { like: 0, dislike: 0 },
-            },
-          ]);
+          const messageId = data.message_id;  
+  
+          setGeneratedData(prevData => prevData.map(d =>
+            d.messageId === sendingData.messageId 
+              ? { ...d, messageId: messageId, rating: { like: 0, dislike: 0 } } 
+              : d
+          ));
         } else {
           console.error('Ошибка при отправке:', data.error);
         }
@@ -120,6 +112,7 @@ function App() {
         setIsSending(false);
       });
   };
+  
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -132,7 +125,6 @@ function App() {
       setGeneratedData((prevData) => [
         ...prevData,
         {
-          content: relatedElements,
           description: `${inputValue}`,
           messageId: messageId,
           rating: { like: 0, dislike: 0 },
@@ -155,22 +147,20 @@ function App() {
       console.log("Получены данные через WebSocket:", parsedData);
 
       setGeneratedData(prevData => {
-        const newData = prevData.map(data => {
-          const frontendMessageId = data.messageId;
-          const backendMessageId = parsedData.message_id;
-
-          if (frontendMessageId === backendMessageId) {
+        return prevData.map(data => {
+          console.log(`Соответствие message_id: ${data.messageId} и WebSocket message_id: ${parsedData.message_id}`);
+          if (data.messageId === parsedData.message_id) {
+            console.log(`Обновляем рейтинг для сообщения с ID ${parsedData.message_id}. Тип рейтинга: ${parsedData.rating}`);
             return {
               ...data,
               rating: {
                 like: parsedData.rating === 'like' ? (data.rating.like + 1) : data.rating.like,
-                dislike: parsedData.rating === 'dislike' ? (data.rating.dislike + 1) : data.rating.dislike
+                dislike: parsedData.rating === 'dislike' ? (data.rating.dislike + 1) : data.rating.dislike,
               }
             };
           }
           return data;
         });
-        return [...newData];
       });
     });
 
@@ -182,6 +172,7 @@ function App() {
       socket.disconnect();
     };
   }, []);
+
 
   return (
     <div className={`App ${isGenerated ? 'fixed' : 'initial'}`}>
@@ -230,19 +221,19 @@ function App() {
           {generatedData.slice().reverse().map((data, index) => (
             <div key={index} className="generated-item">
               <div className="generated-content-block">
-                {data.content}
+                {relatedElements}
               </div>
               <div className="generated-description-block">
                 <p className="generated-description">
                   <span className="bold-text">Описание для запроса:</span> <span className="italic-text">{data.description}</span>
                 </p>
                 <br />
-                <button onClick={handleSendForApproval} className="confirm-button">
+                <button onClick={() => handleSendForApproval(data.messageId)} className="confirm-button">
                   Отправить на согласование
                 </button>
                 <p>
-                <br></br>
-                 <b>Согласовано:</b> {data.rating?.like ?? 0} | <b>Отказано:</b> {data.rating?.dislike ?? 0}
+                  <br></br>
+                  <b>Согласовано:</b> {data.rating?.like ?? 0} | <b>Отказано:</b> {data.rating?.dislike ?? 0}
                 </p>
               </div>
             </div>

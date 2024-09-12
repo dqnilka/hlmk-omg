@@ -8,15 +8,14 @@ from flask_cors import CORS
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
 from flask_socketio import SocketIO, emit
 
-TELEGRAM_TOKEN = ''
+TELEGRAM_TOKEN = '7304368665:AAHaDslyPe06nmsvihiK9AKbrRWIv6FAEDA'
 USER_ID = '465391024'
 
 bot = telebot.TeleBot(TELEGRAM_TOKEN)
 app = Flask(__name__)
 CORS(app)
 
-# Создаем объект socketio для отправки сообщений через WebSocket
-# Разрешаем запросы с http://localhost:3000
+
 socketio = SocketIO(app, cors_allowed_origins="http://localhost:3000")
 
 def save_image(image_data):
@@ -65,23 +64,26 @@ def send_message():
                 parse_mode='Markdown'
             )
 
-        # Возвращаем идентификатор сообщения Telegram на фронтенд
+       
         return jsonify({'success': True, 'message': 'Сообщение отправлено!', 'message_id': sent_message.message_id}), 200
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500
+
 
 
 @bot.callback_query_handler(func=lambda call: call.data in ["like", "dislike"])
 def handle_rating_callback(call):
     user_id = call.from_user.id
     rating = call.data
-    message_id = call.message.message_id  # ID сообщения
+    message_id = call.message.message_id 
+
+    print(f"WebSocket: Отправляем данные: message_id={message_id}, rating={rating}")
 
     result_message = "Спасибо за оценку!" if rating == "like" else "Мы учтём ваше мнение!"
     bot.send_message(user_id, result_message)
 
     try:
-        # Отправляем обновление по WebSocket
+        
         socketio.emit('rating_update', {
             'message_id': message_id,
             'rating': rating,
@@ -89,13 +91,14 @@ def handle_rating_callback(call):
     except Exception as e:
         print(f"Ошибка при отправке оценки через WebSocket: {e}")
 
+
 @app.route('/update-rating', methods=['POST'])
 def update_rating():
     data = request.json
     message_id = data.get('message_id')
     rating = data.get('rating')
 
-    # Логика обновления рейтинга для соответствующего блока на фронтенде
+   
     socketio.emit('rating_update', {
         'message_id': message_id,
         'rating': rating
@@ -107,7 +110,7 @@ def start_bot():
     bot.polling()
 
 if __name__ == '__main__':
-    # Запуск Flask-сервера с поддержкой WebSocket
+  
     bot_thread = threading.Thread(target=start_bot)
     bot_thread.start()
     
