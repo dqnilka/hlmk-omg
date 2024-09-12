@@ -1,7 +1,9 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import './App.css';
-import logoImage from './test.png';
+import logoImage from './logo.svg';
 import html2canvas from 'html2canvas';
+import { Avatar, Button, File, Select } from '@nlmk/ds-2.0';
+import { io } from "socket.io-client";
 
 function App() {
   const [inputValue, setInputValue] = useState('');
@@ -13,9 +15,10 @@ function App() {
   const [showPopup, setShowPopup] = useState(false);
   const [comment, setComment] = useState('');
   const [isSending, setIsSending] = useState(false);
-  const [initialRequest, setInitialRequest] = useState(''); 
+  const [initialRequest, setInitialRequest] = useState('');
+  const [relatedElements, setRelatedElements] = useState(null);
 
-  const relatedElementsRef = useRef(); 
+  const relatedElementsRef = useRef();
 
   const updateDateTime = () => {
     setDateTime(new Date());
@@ -25,6 +28,34 @@ function App() {
     const interval = setInterval(updateDateTime, 1000);
     return () => clearInterval(interval);
   }, []);
+
+  const generateRelatedElements = useCallback(() => {
+    return (
+      <div ref={relatedElementsRef}>
+        <Avatar userName="Иван" userSurname="Иванов" />
+        <br />
+        <File label="Прикрепите файл" />
+        <br />
+        <Select
+          options={[
+            { value: 'male', label: 'Мужской' },
+            { value: 'female', label: 'Женский' }
+          ]}
+          label="Пол"
+          selected={[]}
+          onSelectionChange={() => {}}
+        />
+        <br />
+        <Button style={{ backgroundColor: 'blue', color: 'white' }}>
+          Сдать ответ
+        </Button>
+      </div>
+    );
+  }, []);
+
+  useEffect(() => {
+    setRelatedElements(generateRelatedElements());
+  }, [generateRelatedElements]);
 
   const handleInputChange = (event) => {
     setInputValue(event.target.value);
@@ -40,43 +71,7 @@ function App() {
     }
   };
 
-  const generateRelatedElements = () => {
-    const relatedElements = [
-      <div ref={relatedElementsRef}>
-        <header>
-          <h1>Личный сайт</h1>
-          <p>Который сделан на основе готового шаблона</p>
-          <nav>
-            <ul>
-              <li><a href="index.html">Эта страница</a></li>
-              <li><a href="catalog.html">Другая страница</a></li>
-            </ul>
-          </nav>
-        </header>
-        <main>
-          <section>
-            <h2>Первая секция</h2>
-            <p>Она обо мне</p>
-            <p>Но может быть и о семантике, я пока не решил.</p>
-          </section>
-          <section>
-            <h2>Вторая секция</h2>
-            <p>Она тоже обо мне</p>
-          </section>
-          <section>
-            <h2>И третья</h2>
-            <p>Вы уже должны были начать догадываться.</p>
-          </section>
-        </main>
-        <footer>
-          <p>Сюда бы я вписал информацию об авторе и ссылки на другие сайты</p>
-        </footer>
-      </div>
-    ];
-    return relatedElements;
-  };
-
-  const handleSendForApproval = (index) => {
+  const handleSendForApproval = () => {
     setShowPopup(true);
   };
 
@@ -95,13 +90,24 @@ function App() {
       body: JSON.stringify({
         message: comment,
         image: imageData,
-        initialRequest: initialRequest,  
+        initialRequest: initialRequest,
       }),
     })
       .then(response => response.json())
       .then(data => {
         if (data.success) {
           console.log('Комментарий, скриншот и первоначальный запрос отправлены:', data.message);
+          const messageId = data.message_id;
+
+          setGeneratedData(prevData => [
+            ...prevData,
+            {
+              content: relatedElements,
+              description: `${initialRequest}`,
+              messageId: messageId,
+              rating: { like: 0, dislike: 0 },
+            },
+          ]);
         } else {
           console.error('Ошибка при отправке:', data.error);
         }
@@ -120,19 +126,62 @@ function App() {
     setIsLoading(true);
 
     setTimeout(() => {
+      const messageId = Date.now();
+
       setIsLoading(false);
       setGeneratedData((prevData) => [
         ...prevData,
         {
-          content: generateRelatedElements(),
+          content: relatedElements,
           description: `${inputValue}`,
+          messageId: messageId,
+          rating: { like: 0, dislike: 0 },
         },
       ]);
-      setInitialRequest(inputValue);  
-      setInputValue('');  
+      setInitialRequest(inputValue);
+      setInputValue('');
       setIsGenerated(true);
     }, 1500);
   };
+
+  useEffect(() => {
+    const socket = io('http://localhost:5000');
+
+    socket.on('connect', () => {
+      console.log("WebSocket соединение установлено");
+    });
+
+    socket.on('rating_update', (parsedData) => {
+      console.log("Получены данные через WebSocket:", parsedData);
+
+      setGeneratedData(prevData => {
+        const newData = prevData.map(data => {
+          const frontendMessageId = data.messageId;
+          const backendMessageId = parsedData.message_id;
+
+          if (frontendMessageId === backendMessageId) {
+            return {
+              ...data,
+              rating: {
+                like: parsedData.rating === 'like' ? (data.rating.like + 1) : data.rating.like,
+                dislike: parsedData.rating === 'dislike' ? (data.rating.dislike + 1) : data.rating.dislike
+              }
+            };
+          }
+          return data;
+        });
+        return [...newData];
+      });
+    });
+
+    socket.on('disconnect', () => {
+      console.log("WebSocket соединение закрыто");
+    });
+
+    return () => {
+      socket.disconnect();
+    };
+  }, []);
 
   return (
     <div className={`App ${isGenerated ? 'fixed' : 'initial'}`}>
@@ -148,8 +197,8 @@ function App() {
           </div>
         )}
         <div className="header-center">
-          {!isGenerated && <h1>HLMK Corporate Page Generator</h1>}
-          <br></br>
+          {!isGenerated && <h1>НЛМК Corporate Page Generator</h1>}
+          <br />
           <form onSubmit={handleSubmit} className="input-wrapper">
             <input
               type="text"
@@ -181,18 +230,20 @@ function App() {
           {generatedData.slice().reverse().map((data, index) => (
             <div key={index} className="generated-item">
               <div className="generated-content-block">
-                {data.content.map((element, i) => (
-                  <div key={i}>{element}</div>
-                ))}
+                {data.content}
               </div>
               <div className="generated-description-block">
                 <p className="generated-description">
                   <span className="bold-text">Описание для запроса:</span> <span className="italic-text">{data.description}</span>
                 </p>
-                <br></br>
-                <button onClick={() => handleSendForApproval(index)} className="confirm-button">
+                <br />
+                <button onClick={handleSendForApproval} className="confirm-button">
                   Отправить на согласование
                 </button>
+                <p>
+                <br></br>
+                 <b>Согласовано:</b> {data.rating?.like ?? 0} | <b>Отказано:</b> {data.rating?.dislike ?? 0}
+                </p>
               </div>
             </div>
           ))}
@@ -203,7 +254,7 @@ function App() {
         <div className="popup-overlay">
           <div className="popup-content">
             <h2>Введите комментарий</h2>
-            <br></br>
+            <br />
             <input
               type="text"
               value={comment}
@@ -211,9 +262,9 @@ function App() {
               className="comment-input-popup"
               placeholder="Введите комментарий"
             />
-            <br></br>
+            <br />
             <button onClick={handleSubmitComment} className="confirm-button">
-              Подтвердить
+              Отправить
             </button>
           </div>
         </div>

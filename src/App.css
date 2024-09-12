@@ -35,9 +35,9 @@ body {
 }
 
 .header-image {
-  width: 350px;
+  width: 200px;
   height: auto;
-  margin-bottom: 20px;
+  margin-bottom: 40px;
 }
 
 /* Состояние после генерации */
@@ -83,7 +83,7 @@ body {
 }
 
 .header-logo {
-  width: 150px;
+  width: 121px;
   height: auto;
   margin-right: 15px;
 }
@@ -112,7 +112,7 @@ body {
 .confirm-button {
   padding: 10px 20px;
   font-size: 16px;
-  background-color: #015291;
+  background-color: #168ff8;
   color: white;
   border: none;
   border-radius: 8px;
@@ -121,7 +121,7 @@ body {
 }
 
 .confirm-button:hover {
-  background-color: #013d70;
+  background-color: #168ff8;
 }
 
 .generated-results-container {
@@ -173,10 +173,10 @@ body {
   align-items: center;
   margin-top: 120px;
   width: 100%;
-  height: 125px;
+  height: 235px;
   padding: 20px;
   border-radius: 20px;
-  background-color: #7a93a7;
+  background-color: #edeef0;
 }
 
 .generated-description {
@@ -233,7 +233,7 @@ body {
 
 .loading-spinner {
   border: 8px solid rgba(0, 0, 0, 0.1);
-  border-left-color: #015291;
+  border-left-color: #168ff8;
   border-radius: 50%;
   width: 100px;
   height: 100px;

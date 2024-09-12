@@ -5,6 +5,8 @@ import base64
 from io import BytesIO
 from PIL import Image
 from flask_cors import CORS
+from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
+from flask_socketio import SocketIO, emit
 
 TELEGRAM_TOKEN = ''
 USER_ID = '465391024'
@@ -13,6 +15,10 @@ bot = telebot.TeleBot(TELEGRAM_TOKEN)
 app = Flask(__name__)
 CORS(app)
 
+# Создаем объект socketio для отправки сообщений через WebSocket
+# Разрешаем запросы с http://localhost:3000
+socketio = SocketIO(app, cors_allowed_origins="http://localhost:3000")
+
 def save_image(image_data):
     image_data = image_data.split(",")[1]
     image_bytes = base64.b64decode(image_data)
@@ -20,6 +26,13 @@ def save_image(image_data):
     image_path = "screenshot.png"
     image.save(image_path)
     return image_path
+
+def create_rating_buttons():
+    keyboard = InlineKeyboardMarkup()
+    like_button = InlineKeyboardButton("Согласовать", callback_data="like")
+    dislike_button = InlineKeyboardButton("Отказать", callback_data="dislike")
+    keyboard.add(like_button, dislike_button)
+    return keyboard
 
 @app.route('/send-message', methods=['POST'])
 def send_message():
@@ -37,24 +50,65 @@ def send_message():
         if image_data:
             image_path = save_image(image_data)
             with open(image_path, 'rb') as image_file:
-                bot.send_photo(
+                sent_message = bot.send_photo(
                     USER_ID,
                     image_file,
                     caption=formatted_message,
+                    reply_markup=create_rating_buttons(),
                     parse_mode='Markdown'
                 )
         else:
-            bot.send_message(USER_ID, formatted_message, parse_mode='Markdown')
+            sent_message = bot.send_message(
+                USER_ID,
+                formatted_message,
+                reply_markup=create_rating_buttons(),
+                parse_mode='Markdown'
+            )
 
-        return jsonify({'success': True, 'message': 'Сообщение, запрос и фотография отправлены!'}), 200
+        # Возвращаем идентификатор сообщения Telegram на фронтенд
+        return jsonify({'success': True, 'message': 'Сообщение отправлено!', 'message_id': sent_message.message_id}), 200
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@bot.callback_query_handler(func=lambda call: call.data in ["like", "dislike"])
+def handle_rating_callback(call):
+    user_id = call.from_user.id
+    rating = call.data
+    message_id = call.message.message_id  # ID сообщения
+
+    result_message = "Спасибо за оценку!" if rating == "like" else "Мы учтём ваше мнение!"
+    bot.send_message(user_id, result_message)
+
+    try:
+        # Отправляем обновление по WebSocket
+        socketio.emit('rating_update', {
+            'message_id': message_id,
+            'rating': rating,
+        })
+    except Exception as e:
+        print(f"Ошибка при отправке оценки через WebSocket: {e}")
+
+@app.route('/update-rating', methods=['POST'])
+def update_rating():
+    data = request.json
+    message_id = data.get('message_id')
+    rating = data.get('rating')
+
+    # Логика обновления рейтинга для соответствующего блока на фронтенде
+    socketio.emit('rating_update', {
+        'message_id': message_id,
+        'rating': rating
+    })
+
+    return jsonify({'success': True, 'message': 'Рейтинг обновлен'}), 200
 
 def start_bot():
     bot.polling()
 
 if __name__ == '__main__':
+    # Запуск Flask-сервера с поддержкой WebSocket
     bot_thread = threading.Thread(target=start_bot)
     bot_thread.start()
-
-    app.run(host='0.0.0.0', port=5000)
+    
+    socketio.run(app, host='0.0.0.0', port=5000)
