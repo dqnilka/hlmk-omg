@@ -10,7 +10,7 @@ def get_gpt_response(task):
     try:
         # Отправляем запрос к модели
         response = openai.completions.create(
-            model="gpt-4",  # Используем модель GPT-4 или другую
+            model="gpt-4o",  # Используем модель GPT-4 или другую
             prompt=task,
             max_tokens=5000,  # Максимальное количество токенов в ответе
             temperature=0.7   # Степень креативности ответов
