@@ -277,7 +277,7 @@ function App() {
       <div className="generated-results-container">
         {isLoading && (
           <div className="loading-overlay">
-            <Spinner size="l" />
+            <Spinner size="l" color='#3663aaff' />
           </div>
         )}
 
