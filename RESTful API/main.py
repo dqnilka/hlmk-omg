@@ -1,14 +1,19 @@
 from flask import Flask, jsonify, request
 from flask_cors import CORS
+import sys
+sys.path.append('../ML')
+from get_query import get_answer
 
 app = Flask(__name__)
 CORS(app, resources={r"/api/*": {"origins": "*"}})
+
 
 @app.route("/api/main", methods=["POST"])
 def get_component_data():
     data = request.get_json()
     input_value = data.get('inputValue', '')
-    print(input_value)
+    components = [get_answer(input_value)]
+    print(components)
 
     components = [
         {
