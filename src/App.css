@@ -101,6 +101,7 @@ body {
 }
 
 .text-field {
+  
   padding: 10px;
   font-size: 16px;
   margin-right: 10px;
@@ -143,6 +144,10 @@ body {
 }
 
 .generated-item {
+  width: 300%; /* Сделайте контейнер фиксированной ширины или в процентах */
+  max-width: 1100px; /* Ограничьте максимальную ширину контейнера */
+  overflow-wrap: break-word; /* Разбивает длинные слова, чтобы они не выходили за границы */
+  word-wrap: break-word; /* Для старых браузеров */
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -150,7 +155,6 @@ body {
   padding: 20px;
   border-radius: 20px;
   box-shadow: 0 0 50px rgba(0, 0, 0, 0.1);
-  width: 220%;
   height: 750px;
 }
 
@@ -168,6 +172,7 @@ body {
 }
 
 .generated-description-block {
+
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -182,7 +187,10 @@ body {
 .generated-description {
   font-size: 16px;
   text-align: center;
+  max-width: 100%;
+  /* Можно установить ограничение по ширине, если нужно */
 }
+
 
 
 .popup-overlay {
