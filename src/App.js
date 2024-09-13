@@ -2,12 +2,12 @@ import React, { useState, useEffect, useMemo, useRef } from 'react';
 import './App.css';
 import logoImage from './logo.svg';
 import html2canvas from 'html2canvas';
-import { Avatar, Button, File, Select, Spinner } from '@nlmk/ds-2.0';
+import { Avatar, Button, File, Select, Spinner, Header, ImagePicture, Link, ProgressBar, SegmentButtonGroup, Snackbar, Tabs, Typography, Box, } from '@nlmk/ds-2.0';
 import { io } from "socket.io-client";
 
 function App() {
   const [inputValue, setInputValue] = useState('');
-  const [components, setComponents] = useState([]);  
+  const [components, setComponents] = useState([]);
   const [status, setStatus] = useState('');
   const [dateTime, setDateTime] = useState(new Date());
   const [isLoading, setIsLoading] = useState(false);
@@ -28,21 +28,48 @@ function App() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ inputValue }), 
+        body: JSON.stringify({ inputValue }),
       });
-  
+
       const data = await response.json();
       const { components } = data;
-  
+
       const generatedComponents = components.map((component, index) => {
         let reactComponent;
-  
+
         switch (component.type) {
           case 'Avatar':
             reactComponent = <Avatar key={index} {...component.props} />;
             break;
           case 'File':
             reactComponent = <File key={index} {...component.props} />;
+            break;
+          case 'Header':
+            reactComponent = <Header key={index} {...component.props} />;
+            break;
+          case 'ImagePicture':
+            reactComponent = <ImagePicture key={index} {...component.props} />;
+            break;
+          case 'Link':
+            reactComponent = <Link key={index} {...component.props} />;
+            break;
+          case 'ProgressBar':
+            reactComponent = <ProgressBar key={index} {...component.props} />;
+            break;
+          case 'SegmentButtonGroup':
+            reactComponent = <SegmentButtonGroup key={index} {...component.props} />;
+            break;
+          case 'Snackbar':
+            reactComponent = <Snackbar key={index} {...component.props} />;
+            break;
+          case 'Box':
+            reactComponent = <Box key={index} {...component.props} />;
+            break;
+          case 'Typography':
+            reactComponent = <Typography key={index} {...component.props} />;
+            break;
+          case 'Tabs':
+            reactComponent = <Tabs key={index} {...component.props} />;
             break;
           case 'Select':
             reactComponent = <Select key={index} {...component.props} selected={[]} onSelectionChange={() => { }} />;
@@ -53,29 +80,29 @@ function App() {
           default:
             reactComponent = null;
         }
-  
+
         return (
           <React.Fragment key={index}>
             {reactComponent}
-            <br /> 
+            <br />
           </React.Fragment>
         );
       });
-  
-      setComponents(generatedComponents); 
+
+      setComponents(generatedComponents);
     } catch (error) {
       console.error('Ошибка при получении данных с сервера:', error);
     }
   };
-  
-  
+
+
 
   const relatedElements = useMemo(() => (
     <div ref={relatedElementsRef}>
       {components.length > 0 ? components : 'some text info'}
     </div>
-  ), [components]);  
-  
+  ), [components]);
+
 
   const updateDateTime = () => {
     setDateTime(new Date());

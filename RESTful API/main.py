@@ -13,7 +13,7 @@ app = Flask(__name__)
 CORS(app, resources={r"/api/*": {"origins": "*"}})
 
 # Укажи свой ключ API здесь
-openai.api_key = os.environ.get('OPEN_AI_TOKEN')
+openai.api_key = ''
 
 
 @app.route("/api/main", methods=["POST"])
