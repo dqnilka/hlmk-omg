@@ -9,15 +9,15 @@ openai.api_key = os.environ.get('OPEN_AI_TOKEN')
 def get_gpt_response(task):
     try:
         # Отправляем запрос к модели
-        response = openai.completions.create(
+        response = openai.chat.completions.create(
             model="gpt-4o",  # Используем модель GPT-4 или другую
-            prompt=task,
-            max_tokens=5000,  # Максимальное количество токенов в ответе
+            messages=[{"role": "user", "content": task}],
+            max_tokens=1000,  # Максимальное количество токенов в ответе
             temperature=0.7   # Степень креативности ответов
         )
         
         # Получаем текст ответа
-        return response.choices[0].text.strip()
+        return response.choices[0].message.content
     
     except Exception as e:
         return f"Произошла ошибка: {e}"
