@@ -2,7 +2,10 @@ import React, { useState, useEffect, useMemo, useRef } from 'react';
 import './App.css';
 import logoImage from './logo.svg';
 import html2canvas from 'html2canvas';
-import { Avatar, Button, File, Select, Spinner, Header, ImagePicture, Link, ProgressBar, SegmentButtonGroup, Snackbar, Tabs, Typography, Box, } from '@nlmk/ds-2.0';
+import {
+  Avatar, Button, File, Select, Spinner, Header, ImagePicture, Link, ProgressBar,
+  SegmentButtonGroup, Snackbar, Tabs, Typography, Box,
+} from '@nlmk/ds-2.0';
 import { io } from "socket.io-client";
 
 function App() {
@@ -92,17 +95,15 @@ function App() {
       setComponents(generatedComponents);
     } catch (error) {
       console.error('Ошибка при получении данных с сервера:', error);
+      // Вы можете добавить обработку ошибки здесь
     }
   };
-
-
 
   const relatedElements = useMemo(() => (
     <div ref={relatedElementsRef}>
       {components.length > 0 ? components : 'some text info'}
     </div>
   ), [components]);
-
 
   const updateDateTime = () => {
     setDateTime(new Date());
@@ -175,17 +176,16 @@ function App() {
       });
   };
 
-
-  const handleSubmit = (event) => {
+  // Изменили функцию handleSubmit
+  const handleSubmit = async (event) => {
     event.preventDefault();
     setIsLoading(true);
 
-    fetchComponentsFromServer();
+    try {
+      await fetchComponentsFromServer(); // Ждем завершения запроса
 
-    setTimeout(() => {
       const messageId = Date.now();
 
-      setIsLoading(false);
       setGeneratedData((prevData) => [
         ...prevData,
         {
@@ -197,7 +197,12 @@ function App() {
       setInitialRequest(inputValue);
       setInputValue('');
       setIsGenerated(true);
-    }, 1500);
+    } catch (error) {
+      console.error('Ошибка в handleSubmit:', error);
+      // Здесь можно добавить отображение ошибки для пользователя
+    } finally {
+      setIsLoading(false); // Спиннер остановится после завершения запроса, независимо от результата
+    }
   };
 
   useEffect(() => {
@@ -236,7 +241,6 @@ function App() {
       socket.disconnect();
     };
   }, []);
-
 
   return (
     <div className={`App ${isGenerated ? 'fixed' : 'initial'}`}>
