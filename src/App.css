@@ -113,7 +113,7 @@ body {
 .confirm-button {
   padding: 10px 20px;
   font-size: 16px;
-  background-color: #168ff8;
+  background-color: #3663aaff;
   color: white;
   border: none;
   border-radius: 8px;
@@ -122,7 +122,7 @@ body {
 }
 
 .confirm-button:hover {
-  background-color: #168ff8;
+  background-color: #3663aaff;
 }
 
 .generated-results-container {
@@ -241,7 +241,7 @@ body {
 
 .loading-spinner {
   border: 8px solid rgba(0, 0, 0, 0.1);
-  border-left-color: #168ff8;
+  border-left-color: #3663aaff;
   border-radius: 50%;
   width: 100px;
   height: 100px;
