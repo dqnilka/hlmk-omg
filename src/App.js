@@ -331,7 +331,7 @@ function App() {
 
       {isSending && (
         <div className="loading-overlay">
-          <Spinner size="l" />
+          <Spinner size="l" color='#3663aaff'/>
         </div>
       )}
     </div>
